@@ -1,33 +1,34 @@
-# KairoBail F3 — Patched Build
+# KairoBail F3 — Panel Ready
 
-A patched build of the KairoBail library with a startup watermark in `lib/index.js`. This repository is a community-modified build and is not represented as the official upstream Baileys project. Preserve the included license and upstream attribution.
+Community-modified Baileys-compatible library plus a minimal runnable WhatsApp bot scaffold.
 
-## Requirements
+## Deploy ke Pterodactyl
 
-- Node.js 20 or newer
-- npm
+1. Upload semua isi repository ini ke GitHub.
+2. Di panel, pilih Node.js 20 atau lebih baru.
+3. Startup command: `npm start`
+4. Tidak perlu menjalankan `npm install` secara manual. Pada boot pertama, `bootstrap.js` akan memasang dependency runtime secara otomatis; server harus memiliki akses internet dan izin tulis.
+5. Setelah terhubung, sesi disimpan di folder `session/` agar dapat digunakan lagi saat restart. Jangan bagikan folder tersebut.
 
-## Install from your GitHub repository
+## Pairing
 
-After uploading this folder to your own GitHub repository, install it in a Node.js project with:
+- **QR:** jalankan `npm start`, lalu scan QR yang muncul di console panel.
+- **Pairing code:** atur environment variable `PHONE_NUMBER` di panel dengan nomor internasional angka saja, contoh `62812xxxxxxx`, lalu restart. Jangan sertakan tanda `+`.
 
-```bash
-npm install github:YOUR_GITHUB_USERNAME/YOUR_REPOSITORY
-```
+Bot contoh membalas `!ping` dengan `Pong! KairoBail F3 aktif`.
 
-Replace the placeholders with your GitHub username and repository name. Check the package dependencies and native/runtime requirements in `package.json` before deploying.
+## Catatan penting
 
-## Use
+- Ini adalah library komunitas dan contoh bot minimal, bukan proyek resmi WhatsApp.
+- Boot pertama tetap perlu internet untuk mengunduh dependency. Yang dihilangkan adalah kebutuhan menjalankan `npm install` secara manual.
+- Gunakan Node.js 20+. Pastikan panel mengizinkan proses install saat startup dan direktori proyek dapat ditulis.
+- Simpan sesi sebagai rahasia; jangan upload `session/` ke GitHub. `.gitignore` mengabaikan folder sesi.
+- `whatsapp-rust-bridge` dipatok ke `0.5.5` untuk menghindari error CommonJS `ERR_PACKAGE_PATH_NOT_EXPORTED` yang muncul pada versi sebelumnya.
 
-The package entry point is `lib/index.js`. Its exported API follows the files included in this build; consult `lib/index.d.ts` for exported types. This package is a library, not a complete bot application. You must create your own application entry point and configure authentication/session storage before connecting a WhatsApp account.
+## KairoBail F3 panel launcher notes
 
-## Watermark
-
-The startup watermark is in `lib/index.js` and prints when the package entry point is loaded.
-
-## Before publishing
-
-1. Replace the placeholder `repository.url` and `bugs.url` values in `package.json` with your own repository URLs.
-2. Review license and attribution obligations.
-3. Test installation and connection behavior in a separate project.
-4. Do not commit WhatsApp session credentials, tokens, or private keys.
+- Start with `npm start`. If runtime dependencies are missing, `bootstrap.js` installs production dependencies automatically and skips package lifecycle/build scripts. The first boot still needs internet access and write permission for `node_modules`.
+- Session credentials are saved under `./session` by default; keep this folder persistent between restarts and do not share it. Set `SESSION_DIR` to a persistent panel path if needed.
+- Temporary network disconnects retry with backoff. If WhatsApp reports `loggedOut` because the account owner unlinked/revoked the device, the library stops and requires the owner to pair it again; it cannot override that action.
+- Linked-device protocol can be used with regular WhatsApp, WhatsApp Business, and compatible beta versions. Compatibility can still vary with WhatsApp-side changes.
+- Optional panel variables: `PHONE_NUMBER` (digits including country code, for pairing code), `SESSION_DIR`, `LOG_LEVEL`, `RECONNECT_DELAY_MS`, `RECONNECT_MAX_DELAY_MS`, `WA_BROWSER_NAME`, `WA_BROWSER_PLATFORM`, and `WA_BROWSER_VERSION`.
