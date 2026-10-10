@@ -78,7 +78,11 @@ async function connect() {
 
   if (PHONE_NUMBER && !state.creds.registered) {
     try {
-      const code = await sock.requestPairingCode(PHONE_NUMBER);
+      const customCode = (process.env.PAIRING_CODE || 'KAIRO123').trim().toUpperCase();
+      if (!/^[A-Z0-9]{8}$/.test(customCode)) {
+        throw new Error('PAIRING_CODE harus tepat 8 karakter alfanumerik.');
+      }
+      const code = await sock.requestPairingCode(PHONE_NUMBER, customCode);
       console.log('\n[KairoBail] PAIRING CODE:', code);
       console.log('[KairoBail] Masukkan di WhatsApp > Perangkat tertaut > Tautkan dengan nomor telepon.');
     } catch (e) {
